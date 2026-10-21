@@ -1,0 +1,55 @@
+extends: spectral:oas
+rules:
+  path-kebab-case:
+    description: Path segments must use kebab-case, not snake_case or camelCase.
+    message: "{{property}} should be kebab-case (e.g. /order-items, not /order_items)"
+    given: "$.paths[*]~"
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^/$|^(/([a-z0-9]+(-[a-z0-9]+)*|\\{[^}]+\\}))+$"
+
+  operation-operationId-required:
+    description: Every operation must define an operationId.
+    message: "Operation is missing an operationId"
+    given: "$.paths[*][get,put,post,delete,options,head,patch,trace]"
+    severity: error
+    then:
+      field: operationId
+      function: truthy
+
+  operation-security-required:
+    description: Every operation must define a non-empty security requirement.
+    message: "Operation is missing a security requirement"
+    given: "$.paths[*][get,put,post,delete,options,head,patch,trace]"
+    severity: error
+    then:
+      field: security
+      function: schema
+      functionOptions:
+        schema:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            minProperties: 1
+
+  operation-description-required:
+    description: Every operation must document what it does.
+    message: "Operation is missing a description"
+    given: "$.paths[*][get,put,post,delete,options,head,patch,trace]"
+    severity: warn
+    then:
+      field: description
+      function: truthy
+
+  error-response-schema:
+    description: Every 4xx/5xx response must define an application/json response schema.
+    message: "Error response is missing an application/json schema"
+    given: "$.paths[*][get,put,post,delete,options,head,patch,trace].responses[?(@property >= 400 && @property < 600)]"
+    severity: warn
+    then:
+      field: content.application/json.schema
+      function: truthy
+

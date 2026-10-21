@@ -1,0 +1,24 @@
+openapi: 3.0.3
+info:
+  title: Orders API
+  version: 1.0.0
+
+paths:
+  /order-items:
+    get:
+      summary: List order items
+      operationId: listOrderItems
+      description: Lists order items.
+      security: [{apiKey: []}]
+      responses:
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    apiKey: {type: apiKey, in: header, name: X-API-Key}
+  schemas:
+    Error: {type: object, properties: {code: {type: string}, message: {type: string}}}
