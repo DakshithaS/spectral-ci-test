@@ -1,7 +1,8 @@
 name: SARIF tests
 
 on:
-  pull_request:
+  push:
+    branches: [test4-sarif]
 
 jobs:
   a-naive-write:
@@ -21,7 +22,7 @@ jobs:
 
         with:
           sarif_file: spectral.sarif
-          category: a-naive-write
+          category: push-a
   b-always-readonly:
     runs-on: ubuntu-latest
     permissions:
@@ -38,7 +39,7 @@ jobs:
         if: always()
         with:
           sarif_file: spectral.sarif
-          category: b-always-readonly
+          category: push-b
   c-always-write:
     runs-on: ubuntu-latest
     permissions:
@@ -56,4 +57,4 @@ jobs:
         if: always()
         with:
           sarif_file: spectral.sarif
-          category: c-always-write
+          category: push-c
