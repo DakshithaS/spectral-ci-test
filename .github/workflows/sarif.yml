@@ -1,0 +1,60 @@
+name: SARIF tests
+
+on:
+  push:
+    branches: [test4-sarif]
+
+jobs:
+  a-naive-write:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npx spectral lint openapi.yaml --fail-severity=error --format sarif --output spectral.sarif
+      - uses: github/codeql-action/upload-sarif@v4
+
+        with:
+          sarif_file: spectral.sarif
+          category: push-a
+  b-always-readonly:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npx spectral lint openapi.yaml --fail-severity=error --format sarif --output spectral.sarif
+      - uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: spectral.sarif
+          category: push-b
+  c-always-write:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npx spectral lint openapi.yaml --fail-severity=error --format sarif --output spectral.sarif
+      - uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: spectral.sarif
+          category: push-c
